@@ -1,4 +1,5 @@
 const express = require('express');
+const serverless = require("serverless-http");
 const app = express();
 const appRoutes = require("./api/routes");
 const userRoutes =require("./api/routeuser")
@@ -7,7 +8,7 @@ const bodyPraser = require('body-parser');
 const cors = require('cors');
 const {isUser} = require("./api/middleware/auth.middleware")
 const mongoDBUri = process.env.DB_URI;
-
+const router = express.Router();
 //..
 mongoose.connect(mongoDBUri, {
   useNewUrlParser: true,
@@ -25,6 +26,8 @@ mongoose.connection.on('error', (err) => {
 app.use(express.json());
 app.use(cors());
 
+app.use("/.netlify/functions/app", router);
+module.exports.handler = serverless(app);
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
